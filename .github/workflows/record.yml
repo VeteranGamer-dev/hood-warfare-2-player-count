@@ -1,0 +1,36 @@
+name: Record player count
+
+on:
+  schedule:
+    - cron: "17 * * * *"   # every hour at :17 (avoids the top-of-hour rush)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: record
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install pillow
+      - run: python scripts/record.py
+      - name: Commit the new reading
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/players.csv chart.png README.md
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+          else
+            git commit -m "Reading: $(tail -n 1 data/players.csv)"
+            git push
+          fi
