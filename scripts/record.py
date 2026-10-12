@@ -67,7 +67,8 @@ def read_rows():
 
 def append_row(t, players):
     with CSV_PATH.open("a", newline="", encoding="utf-8") as f:
-        csv.writer(f).writerow([t.strftime("%Y-%m-%dT%H:%M:%SZ"), players, "steam_api"])
+        csv.writer(f, lineterminator="
+").writerow([t.strftime("%Y-%m-%dT%H:%M:%SZ"), players, "steam_api"])
 
 
 # ---------------------------------------------------------------- time
