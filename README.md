@@ -14,6 +14,10 @@ How many people are playing [Hood Warfare 2](https://store.steampowered.com/app/
 4 readings since Oct 12, 2026, 9:04 AM EDT.
 <!-- stats:end -->
 
+## Before this tracker started
+
+Hood Warfare 2 launched on Steam on October 8, 2026. This tracker only contains readings it took itself, starting October 12. For the earlier days, [SteamDB](https://steamdb.info/app/5155360/charts/) recorded a peak of about 4,500 concurrent players on October 12, 2026 (UTC), and players kept climbing after that, with 7,808 online on the evening of October 12 (US Eastern). See SteamDB for the full history since launch.
+
 ## What the number means
 
 This is the number Steam reports as "in game" right now. It counts everyone who has Hood Warfare 2 open, including people sitting in menus and people playing bot matches. That's why the in-game lobby list can look much emptier than this number: it only shows public lobbies you can join at that moment.
