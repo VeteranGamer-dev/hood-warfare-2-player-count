@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
-"""Record Hood Warfare 2's concurrent Steam players and redraw the chart.
+"""Sync Hood Warfare 2's concurrent Steam players and redraw the chart.
 
-Runs hourly in GitHub Actions: appends one row to data/players.csv, redraws
-chart.png and refreshes the stats block in README.md.
+The hourly readings are taken by a Cloudflare Worker (cron, data.hoodwarfare2.org),
+because GitHub's scheduled runs can be late or skipped. This script runs in GitHub
+Actions: it pulls every reading the Worker has, merges them into data/players.csv,
+redraws chart.png and refreshes the stats block in README.md. If the Worker can't
+be reached it falls back to reading Steam directly.
 
-    python scripts/record.py            fetch, append, redraw
+    python scripts/record.py            sync, redraw
     python scripts/record.py --render   redraw from the existing CSV only
 
 Standard library + Pillow only.
@@ -21,6 +24,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 APP_ID = 5155360
 API = f"https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid={APP_ID}"
+WORKER_DATA = "https://data.hoodwarfare2.org/hw2/players.json"
 ROOT = Path(__file__).resolve().parent.parent
 CSV_PATH = ROOT / "data" / "players.csv"
 CHART_PATH = ROOT / "chart.png"
@@ -68,6 +72,26 @@ def read_rows():
 def append_row(t, players):
     with CSV_PATH.open("a", newline="", encoding="utf-8") as f:
         csv.writer(f, lineterminator="\n").writerow([t.strftime("%Y-%m-%dT%H:%M:%SZ"), players, "steam_api"])
+
+
+def fetch_worker_rows():
+    try:
+        req = urllib.request.Request(WORKER_DATA, headers={"User-Agent": "hw2-player-count-tracker"})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.load(r)
+        return [(dt.datetime.strptime(x["t"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc), int(x["p"]), x["s"])
+                for x in data]
+    except Exception as e:
+        print(f"worker sync failed: {e}", file=sys.stderr)
+        return None
+
+
+def write_rows(rows):
+    with CSV_PATH.open("w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(["timestamp_utc", "players", "source"])
+        for t, p, s in rows:
+            w.writerow([t.strftime("%Y-%m-%dT%H:%M:%SZ"), p, s])
 
 
 # ---------------------------------------------------------------- time
@@ -179,20 +203,22 @@ def render(rows):
             cur = [r]
     runs.append(cur)
 
+    # a run shorter than 30 minutes would draw as a hairline sliver, so show its points instead
+    is_line = lambda run: len(run) > 1 and run[-1][0] - run[0][0] >= dt.timedelta(minutes=30)
     wash = Image.new("RGBA", img.size, (0, 0, 0, 0))
     wd = ImageDraw.Draw(wash)
-    for run in runs:
-        if len(run) > 1:
-            pts = [(X(t), Y(v)) for t, v, _ in run]
-            wd.polygon(pts + [(pts[-1][0], Y(0)), (pts[0][0], Y(0))], fill=AREA)
+    for run in filter(is_line, runs):
+        pts = [(X(t), Y(v)) for t, v, _ in run]
+        wd.polygon(pts + [(pts[-1][0], Y(0)), (pts[0][0], Y(0))], fill=AREA)
     img = Image.alpha_composite(img, wash)
     d = ImageDraw.Draw(img)
     for run in runs:
         pts = [(X(t), Y(v)) for t, v, _ in run]
-        if len(pts) > 1:
+        if is_line(run):
             d.line(pts, fill=LINE, width=2 * S, joint="curve")
-        for x, y in pts if len(pts) == 1 else []:
-            d.ellipse([x - 3 * S, y - 3 * S, x + 3 * S, y + 3 * S], fill=LINE)
+        else:
+            for x, y in pts:
+                d.ellipse([x - 3 * S, y - 3 * S, x + 3 * S, y + 3 * S], fill=LINE)
 
     def marker(t, v):
         x, y = X(t), Y(v)
@@ -254,13 +280,20 @@ def update_readme(rows):
 
 def main():
     if "--render" not in sys.argv:
-        players = fetch_players()
-        if players is None:
-            print("no reading this hour; leaving files unchanged")
-            return
-        now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
-        append_row(now, players)
-        print(f"{now:%Y-%m-%dT%H:%M:%SZ} {players}")
+        remote = fetch_worker_rows()
+        if remote is not None:
+            merged = {t: (t, p, s) for t, p, s in read_rows()}
+            merged.update({t: (t, p, s) for t, p, s in remote})
+            write_rows(sorted(merged.values()))
+            print(f"synced {len(remote)} readings from the worker; {len(merged)} in total")
+        else:
+            players = fetch_players()
+            if players is None:
+                print("no reading this hour; leaving files unchanged")
+                return
+            now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+            append_row(now, players)
+            print(f"fallback reading {now:%Y-%m-%dT%H:%M:%SZ} {players}")
     rows = read_rows()
     render(rows)
     update_readme(rows)
