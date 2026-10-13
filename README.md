@@ -22,7 +22,7 @@ Hood Warfare 2 launched on Steam on October 8, 2026. This tracker only contains 
 
 This is the number Steam reports as "in game" right now. It counts everyone who has Hood Warfare 2 open, including people sitting in menus and people playing bot matches. That's why the in-game lobby list can look much emptier than this number: it only shows public lobbies you can join at that moment.
 
-For what players think of the game, which platforms it's on, and the player count explained in more detail, see the unofficial fan guide at **[hoodwarfare2.org](https://hoodwarfare2.org/review/#player-count)**.
+For the number right now, an interactive chart and the busiest hours in your own time zone, see the **[live Hood Warfare 2 player count](https://hoodwarfare2.org/player-count/)**. For what players think of the game and why the in-game lobby list looks emptier than Steam's number, see the [Hood Warfare 2 review](https://hoodwarfare2.org/review/#player-count-fake) on the same unofficial fan guide.
 
 ## The data
 
