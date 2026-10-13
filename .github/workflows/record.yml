@@ -31,6 +31,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "nothing to commit"
           else
-            git commit -m "Reading: $(tail -n 1 data/players.csv)"
+            git commit -m "Sync: latest $(tail -n 1 data/players.csv)"
             git push
           fi

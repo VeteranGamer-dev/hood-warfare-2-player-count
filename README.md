@@ -7,11 +7,11 @@ How many people are playing [Hood Warfare 2](https://store.steampowered.com/app/
 <!-- stats:start -->
 | | Players | When (US Eastern) |
 |---|---:|---|
-| Latest reading | **9,293** | Oct 12, 2026, 11:34 PM EDT |
+| Latest reading | **6,603** | Oct 13, 2026, 1:13 AM EDT |
 | Peak in the last 24 hours | 9,293 | Oct 12, 2026, 11:34 PM EDT |
 | Highest reading recorded | 9,293 | Oct 12, 2026, 11:34 PM EDT |
 
-5 readings since Oct 12, 2026, 9:04 AM EDT.
+6 readings since Oct 12, 2026, 9:04 AM EDT.
 <!-- stats:end -->
 
 ## Before this tracker started
@@ -35,7 +35,8 @@ For what players think of the game, which platforms it's on, and the player coun
 | `source` | `steam_api` for automatic hourly readings, `manual` for the two readings taken before the tracker started |
 
 - **Source:** the Steam Web API (`ISteamUserStats/GetNumberOfCurrentPlayers`, app ID 5155360).
-- **How often:** a [GitHub Actions workflow](.github/workflows/record.yml) runs once an hour. GitHub sometimes delays or skips scheduled runs, so expect occasional gaps. Readings more than 3 hours apart aren't joined on the chart.
+- **How often:** a Cloudflare Worker takes a reading every hour at :05 UTC. GitHub's own scheduled runs turned out to be late or skipped too often, so this repo no longer depends on them for the data: a [GitHub Actions workflow](.github/workflows/record.yml) copies everything the Worker has into this CSV and redraws the chart whenever it runs. Readings more than 3 hours apart aren't joined on the chart.
+- **Live copy:** the Worker serves the same data, always up to date, at [data.hoodwarfare2.org/hw2/players.csv](https://data.hoodwarfare2.org/hw2/players.csv) (also [.json](https://data.hoodwarfare2.org/hw2/players.json) and a live [chart](https://data.hoodwarfare2.org/hw2/chart.svg)).
 - **Times on the chart** are US Eastern.
 
 ## Use it
