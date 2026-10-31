@@ -429,3 +429,7 @@ timestamp_utc,players,source
 2026-10-30T20:05:06Z,562,steam_api
 2026-10-30T21:05:06Z,654,steam_api
 2026-10-30T22:05:06Z,675,steam_api
+2026-10-30T23:05:06Z,728,steam_api
+2026-10-31T00:05:07Z,878,steam_api
+2026-10-31T01:05:07Z,998,steam_api
+2026-10-31T02:05:06Z,1182,steam_api
