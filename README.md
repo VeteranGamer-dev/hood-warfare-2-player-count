@@ -7,11 +7,11 @@ How many people are playing [Hood Warfare 2](https://store.steampowered.com/app/
 <!-- stats:start -->
 | | Players | When (US Eastern) |
 |---|---:|---|
-| Latest reading | **786** | Nov 4, 2026, 9:05 PM EST |
-| Peak in the last 24 hours | 890 | Nov 3, 2026, 10:05 PM EST |
+| Latest reading | **169** | Nov 5, 2026, 5:05 AM EST |
+| Peak in the last 24 hours | 836 | Nov 4, 2026, 10:05 PM EST |
 | Highest reading recorded | 15,058 | Oct 13, 2026, 10:05 PM EDT |
 
-554 readings since Oct 12, 2026, 9:04 AM EDT.
+562 readings since Oct 12, 2026, 9:04 AM EDT.
 <!-- stats:end -->
 
 ## Before this tracker started
